@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CRM Imobiliário</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <span class="logo">🏠 CRM Imobiliário</span>
+      <nav>
+        <button class="nav-btn active" onclick="switchTab('form')">Novo Lead</button>
+        <button class="nav-btn" onclick="switchTab('list')">Registros <span id="count-badge"></span></button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===== FORMULÁRIO ===== -->
+    <section id="sec-form" class="tab-section active">
+      <div class="card">
+        <h2 class="section-label">Dados pessoais</h2>
+        <div class="grid2">
+          <div class="field full"><label>Nome completo *</label><input type="text" id="f-nome" placeholder="Ex: Maria Aparecida Santos" /></div>
+          <div class="field"><label>Telefone / WhatsApp *</label><input type="tel" id="f-tel" placeholder="(43) 99999-0000" /></div>
+          <div class="field"><label>E-mail</label><input type="email" id="f-email" placeholder="email@exemplo.com" /></div>
+          <div class="field"><label>CPF</label><input type="text" id="f-cpf" placeholder="000.000.000-00" /></div>
+          <div class="field"><label>Cidade</label><input type="text" id="f-cidade" placeholder="Ex: Londrina" /></div>
+        </div>
+
+        <h2 class="section-label">Interesse no imóvel</h2>
+        <div class="grid3">
+          <div class="field">
+            <label>Tipo de imóvel</label>
+            <select id="f-tipo-imovel">
+              <option>Casa</option><option>Apartamento</option><option>Terreno</option>
+              <option>Comercial</option><option>Rural</option><option>Outro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Finalidade</label>
+            <select id="f-finalidade">
+              <option>Compra</option><option>Locação</option><option>Investimento</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Faixa de valor (R$)</label>
+            <select id="f-valor">
+              <option>Até 200 mil</option><option>200–400 mil</option>
+              <option>400–600 mil</option><option>600 mil–1 mi</option>
+              <option>Acima de 1 mi</option><option>A consultar</option>
+            </select>
+          </div>
+          <div class="field"><label>Bairro / região</label><input type="text" id="f-bairro" placeholder="Ex: Centro, Zona Norte..." /></div>
+          <div class="field">
+            <label>Quartos</label>
+            <select id="f-quartos">
+              <option value="">Indiferente</option>
+              <option>1</option><option>2</option><option>3</option><option value="4+">4 ou mais</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Status do lead</label>
+            <select id="f-status">
+              <option value="Quente">🔥 Quente</option>
+              <option value="Morno">🌤 Morno</option>
+              <option value="Frio">❄️ Frio</option>
+              <option value="Convertido">✅ Convertido</option>
+            </select>
+          </div>
+        </div>
+
+        <h2 class="section-label">Referências de imóveis</h2>
+        <div class="field">
+          <label>Código de referência (ex: 02486.001 ou 15230.15432)</label>
+          <div class="ref-input-row">
+            <input type="text" id="f-ref-input" placeholder="00000.00000"
+              onkeydown="if(event.key==='Enter'){adicionarRef();event.preventDefault();}" />
+            <button class="btn-secondary" onclick="adicionarRef()">+ Adicionar</button>
+          </div>
+          <div class="ref-list" id="ref-list"></div>
+        </div>
+
+        <h2 class="section-label">Observações</h2>
+        <div class="field">
+          <textarea id="f-obs" placeholder="Anotações sobre o lead, visitas agendadas, preferências..."></textarea>
+        </div>
+
+        <div class="form-footer">
+          <button class="btn-primary" onclick="salvar()">Salvar lead</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LISTA ===== -->
+    <section id="sec-list" class="tab-section">
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Total</div></div>
+        <div class="stat"><div class="stat-num" id="s-quente">0</div><div class="stat-lbl">🔥 Quentes</div></div>
+        <div class="stat"><div class="stat-num" id="s-morno">0</div><div class="stat-lbl">🌤 Mornos</div></div>
+        <div class="stat"><div class="stat-num" id="s-conv">0</div><div class="stat-lbl">✅ Convertidos</div></div>
+      </div>
+      <div class="toolbar">
+        <input type="text" id="busca" placeholder="Buscar por nome, telefone, referência..." oninput="renderTabela()" />
+        <button class="btn-secondary" onclick="exportarCSV()">⬇ Exportar CSV</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="tabela">
+          <thead>
+            <tr>
+              <th>Nome</th><th>Telefone</th><th>Tipo</th><th>Finalidade</th>
+              <th>Valor</th><th>Status</th><th>Referências</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div id="empty-state" class="empty-state" style="display:none">Nenhum lead encontrado.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loading" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,0.8);z-index:300;align-items:center;justify-content:center;font-size:14px;color:#6b6b68;gap:10px;flex-direction:column;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 0.8s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+    Carregando dados...
+  </div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+  <!-- MODAL DETALHE -->
+  <div id="modal" class="modal-overlay" onclick="if(event.target===this)fecharModal()">
+    <div class="modal-box" id="modal-content"></div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
