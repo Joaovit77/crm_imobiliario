@@ -14,13 +14,14 @@
       <nav>
         <button class="nav-btn active" onclick="switchTab('form')">Novo Lead</button>
         <button class="nav-btn" onclick="switchTab('list')">Registros <span id="count-badge"></span></button>
+        <button class="nav-btn" onclick="switchTab('feedback')">Feedback de Leads</button>
       </nav>
     </div>
   </header>
 
   <main>
 
-    <!-- ===== FORMULÁRIO ===== -->
+    <!-- ===== FORMULÁRIO NOVO LEAD ===== -->
     <section id="sec-form" class="tab-section active">
       <div class="card">
         <h2 class="section-label">Dados pessoais</h2>
@@ -43,17 +44,15 @@
           </div>
           <div class="field">
             <label>Finalidade</label>
-            <select id="f-finalidade">
-              <option>Compra</option><option>Locação</option><option>Investimento</option>
+            <select id="f-finalidade" onchange="atualizarOpcoesValor()">
+              <option value="Compra">Compra</option>
+              <option value="Locação">Locação</option>
+              <option value="Investimento">Investimento</option>
             </select>
           </div>
           <div class="field">
             <label>Faixa de valor (R$)</label>
-            <select id="f-valor">
-              <option>Até 200 mil</option><option>200–400 mil</option>
-              <option>400–600 mil</option><option>600 mil–1 mi</option>
-              <option>Acima de 1 mi</option><option>A consultar</option>
-            </select>
+            <select id="f-valor"></select>
           </div>
           <div class="field"><label>Bairro / região</label><input type="text" id="f-bairro" placeholder="Ex: Centro, Zona Norte..." /></div>
           <div class="field">
@@ -122,6 +121,32 @@
       </div>
     </section>
 
+    <!-- ===== FEEDBACK DE LEADS ===== -->
+    <section id="sec-feedback" class="tab-section">
+      <div class="card">
+        <h2 class="section-label">Informações do relatório</h2>
+        <div class="grid2">
+          <div class="field"><label>Corretor / Responsável</label><input type="text" id="fb-corretor" placeholder="Seu nome" /></div>
+          <div class="field"><label>Data do relatório</label><input type="date" id="fb-data" /></div>
+          <div class="field full"><label>Observações gerais</label><input type="text" id="fb-obs-geral" placeholder="Ex: Semana de alta demanda, feirão imobiliário..." /></div>
+        </div>
+
+        <h2 class="section-label" style="margin-top:1.5rem;">Feedback por imóvel</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:1rem;">
+          Para cada imóvel, informe a referência, quantos leads foram contatados e o resultado de cada um.
+        </p>
+
+        <div id="fb-entradas"></div>
+
+        <button class="btn-add-entrada" onclick="adicionarEntrada()">+ Adicionar imóvel</button>
+
+        <div class="form-footer" style="gap:10px;margin-top:1.5rem;">
+          <button class="btn-secondary" onclick="limparFeedback()">Limpar tudo</button>
+          <button class="btn-primary" onclick="gerarPDFFeedback()">⬇ Gerar PDF do relatório</button>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- LOADING OVERLAY -->
@@ -139,9 +164,7 @@
   <!-- TOAST -->
   <div id="toast" class="toast"></div>
 
-  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
